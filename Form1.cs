@@ -19,10 +19,18 @@ namespace Algo
 
         public class Circle
         {
-            public int x, y, width, height, initialXLocation, initalYLocation;
+            public float x, y, width, height, initialXLocation, initalYLocation;
             public bool isMovedFromInitialLocation;
 
-            public Circle(int thisX, int thisY, int thisWidth, int thisHeight, bool ifIsMovedFromInitialLocation, int thisInitialXLocation, int thisInitalYLocation)
+            public Circle(
+                float thisX,
+                float thisY,
+                float thisWidth,
+                float thisHeight, 
+                bool ifIsMovedFromInitialLocation,
+                float thisInitialXLocation,
+                float thisInitalYLocation
+            )
             {
                 x = thisX;
                 y = thisY;
@@ -34,15 +42,15 @@ namespace Algo
             }
         }
 
-        IList<Circle> circlesList = new List<Circle>();
+        readonly IList<Circle> circlesList = new List<Circle>();
 
         private void BtnCreateCircle_Click(object sender, EventArgs e)
         {
-            const int radius = 20;
-            const double radian = 45 * Math.PI / 180;
+            const float radius = 50;
+            float radian = Convert.ToSingle(45 * Math.PI / 180);
 
-            int xInputBoxValue = Int32.Parse(XInputBox.Text);
-            int yInputBoxValue = Int32.Parse(YInputBox.Text);
+            float xInputBoxValue = float.Parse(XInputBox.Text);
+            float yInputBoxValue = float.Parse(YInputBox.Text);
 
             Graphics panel = DrawSpace.CreateGraphics();
             Pen redPen = new Pen(Color.Red);
@@ -64,8 +72,20 @@ namespace Algo
                 {
                     if (circlesList[i].x == newCircle.x && circlesList[i].y == newCircle.y)
                     {
-                        int newX = circlesList[i].x + radius * Convert.ToInt32(Math.Cos(radian * (i + 1)));
-                        int newY = circlesList[i].y + radius * Convert.ToInt32(Math.Cos(radian * (i + 1)));
+                        IList<Circle> circlesWithIdenticalInitialCoordinatesList = new List<Circle>();
+
+                        for (int j = 0; j < circlesList.Count; j++)
+                        {
+                            if (circlesList[j].initialXLocation == newCircle.initialXLocation && circlesList[j].initalYLocation == newCircle.initalYLocation)
+                            {
+                                circlesWithIdenticalInitialCoordinatesList.Add(circlesList[j]);
+                            }
+                        }
+
+                        float multiplier = circlesWithIdenticalInitialCoordinatesList.Count();
+
+                        float newX = Convert.ToSingle(circlesList[i].x + radius * Math.Cos(radian * (multiplier)));
+                        float newY = Convert.ToSingle(circlesList[i].y + radius * Math.Sin(radian * (multiplier)));
 
                         newCircle.x = newX;
                         newCircle.y = newY;
