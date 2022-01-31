@@ -46,7 +46,8 @@ namespace Algo
 
         private void BtnCreateCircle_Click(object sender, EventArgs e)
         {
-            const float radius = 50;
+            float radius = 50 * ((circlesList.Count - 1) / 8 + 1);
+            //const float radius = 50;
             float radian = Convert.ToSingle(45 * Math.PI / 180);
 
             float xInputBoxValue = float.Parse(XInputBox.Text);
