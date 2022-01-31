@@ -26,7 +26,7 @@ namespace Algo
                 float thisX,
                 float thisY,
                 float thisWidth,
-                float thisHeight, 
+                float thisHeight,
                 bool ifIsMovedFromInitialLocation,
                 float thisInitialXLocation,
                 float thisInitalYLocation
@@ -42,20 +42,66 @@ namespace Algo
             }
         }
 
-        readonly IList<Circle> circlesList = new List<Circle>();
 
         private void BtnCreateCircle_Click(object sender, EventArgs e)
         {
-            float radius = 50 * ((circlesList.Count - 1) / 8 + 1);
-            //const float radius = 50;
-            float radian = Convert.ToSingle(45 * Math.PI / 180);
 
+            // Création d'un dictionnaire qui contiendra, en clé : les coordonnées X et Y d'un objet, et en valeur : la liste contenant tous les objets ayant ces mêmes coordonnées X et Y.
+            IList<List<Circle>> CircleGroup = new List<List<Circle>>();
+
+
+            // Définition des dimensions de chaque cercle
+            float radius = 50 * ((circlesList.Count - 1) / 8 + 1);
+            //int radius = 50;
+            float degrees = 45;
+            float multiple = 8;
+
+
+            // Données pour le calcul de la position des cercles
+
+            //if (circlesList.Count - 1 % multiple == 0)
+            //{
+            //     radius = 50 * ((circlesList.Count - 1) / (degrees / multiple) + 1);
+            //}
+            float radian = Convert.ToSingle(degrees * Math.PI / 180);
+
+
+            // Récupération des données des inputs
             float xInputBoxValue = float.Parse(XInputBox.Text);
             float yInputBoxValue = float.Parse(YInputBox.Text);
 
-            Graphics panel = DrawSpace.CreateGraphics();
+
+            // Paramétrage de la création des cercles et du panel pour les afficher
             Pen redPen = new Pen(Color.Red);
             SolidBrush brushForRedCircle = new SolidBrush(Color.Red);
+            Graphics panel = DrawSpace.CreateGraphics();
+
+            IList<Circle> circlesList = new List<Circle>();
+
+            if (CircleGroup.Count == 0)
+            {
+                Circle newCircle = new Circle(xInputBoxValue, yInputBoxValue, 10, 10, false, xInputBoxValue, yInputBoxValue);
+                circlesList.Add(newCircle);
+
+                CircleGroup.Add((List<Circle>)circlesList);
+
+                panel.DrawEllipse(redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
+                panel.FillEllipse(brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
+            }
+            else
+            {
+                Circle newCircle = new Circle(xInputBoxValue, yInputBoxValue, 10, 10, false, xInputBoxValue, yInputBoxValue);
+
+
+
+                //foreach (KeyValuePair<float[], List<Circle>> entry in CircleDictionary)
+                //{
+                //    if(newCircle.x == entry.ContainsKey()
+                //    {
+
+                //    }
+                //}
+            }
 
             if (circlesList.Count == 0)
             {
@@ -92,10 +138,10 @@ namespace Algo
                         newCircle.y = newY;
                         newCircle.isMovedFromInitialLocation = true;
 
-                        circlesList.Add(newCircle);
                         break;
                     }
                 }
+                circlesList.Add(newCircle);
 
                 panel.DrawEllipse(redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
                 panel.FillEllipse(brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
@@ -106,5 +152,6 @@ namespace Algo
         {
 
         }
-    }     
+    }
 }
+
