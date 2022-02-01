@@ -42,30 +42,28 @@ namespace Algo
             }
         }
 
+        public class CircleList
+        {
+            public float x, y;
+            public IList<Circle> list;
+
+            public CircleList(
+                float XInitialLocation,
+                float YInitialLocation,
+                IList<Circle> thisCircleList
+            )
+            {
+                x = XInitialLocation;
+                y = YInitialLocation;
+                list = thisCircleList;
+            }
+
+        }
+
+        IList<CircleList> circleListGroup = new List<CircleList>();
 
         private void BtnCreateCircle_Click(object sender, EventArgs e)
         {
-
-            // Création d'un dictionnaire qui contiendra, en clé : les coordonnées X et Y d'un objet, et en valeur : la liste contenant tous les objets ayant ces mêmes coordonnées X et Y.
-            IList<List<Circle>> CircleGroup = new List<List<Circle>>();
-
-
-            // Définition des dimensions de chaque cercle
-            float radius = 50 * ((circlesList.Count - 1) / 8 + 1);
-            //int radius = 50;
-            float degrees = 45;
-            float multiple = 8;
-
-
-            // Données pour le calcul de la position des cercles
-
-            //if (circlesList.Count - 1 % multiple == 0)
-            //{
-            //     radius = 50 * ((circlesList.Count - 1) / (degrees / multiple) + 1);
-            //}
-            float radian = Convert.ToSingle(degrees * Math.PI / 180);
-
-
             // Récupération des données des inputs
             float xInputBoxValue = float.Parse(XInputBox.Text);
             float yInputBoxValue = float.Parse(YInputBox.Text);
@@ -76,15 +74,15 @@ namespace Algo
             SolidBrush brushForRedCircle = new SolidBrush(Color.Red);
             Graphics panel = DrawSpace.CreateGraphics();
 
-            IList<Circle> circlesList = new List<Circle>();
 
-            if (CircleGroup.Count == 0)
+            if (circleListGroup.Count == 0)
             {
                 Circle newCircle = new Circle(xInputBoxValue, yInputBoxValue, 10, 10, false, xInputBoxValue, yInputBoxValue);
-                circlesList.Add(newCircle);
-
-                CircleGroup.Add((List<Circle>)circlesList);
-
+                IList<Circle> list = new List<Circle>();
+                list.Add(newCircle);
+                CircleList circleList = new CircleList(xInputBoxValue, yInputBoxValue, list);
+                circleListGroup.Add(circleList);
+                
                 panel.DrawEllipse(redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
                 panel.FillEllipse(brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
             }
@@ -92,57 +90,46 @@ namespace Algo
             {
                 Circle newCircle = new Circle(xInputBoxValue, yInputBoxValue, 10, 10, false, xInputBoxValue, yInputBoxValue);
 
-
-
-                //foreach (KeyValuePair<float[], List<Circle>> entry in CircleDictionary)
-                //{
-                //    if(newCircle.x == entry.ContainsKey()
-                //    {
-
-                //    }
-                //}
-            }
-
-            if (circlesList.Count == 0)
-            {
-                Circle newCircle = new Circle(xInputBoxValue, yInputBoxValue, 10, 10, false, xInputBoxValue, yInputBoxValue);
-                circlesList.Add(newCircle);
-
-                panel.DrawEllipse(redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
-                panel.FillEllipse(brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
-            }
-            else
-            {
-                Circle newCircle = new Circle(xInputBoxValue, yInputBoxValue, 10, 10, false, xInputBoxValue, yInputBoxValue);
-
-                for (int i = 0; i < circlesList.Count; i++)
+                for (int i = 0; i < circleListGroup.Count(); i++)
                 {
-                    if (circlesList[i].x == newCircle.x && circlesList[i].y == newCircle.y)
+                    if (circleListGroup[i].x == newCircle.x && circleListGroup[i].y == newCircle.y)
                     {
-                        IList<Circle> circlesWithIdenticalInitialCoordinatesList = new List<Circle>();
-
-                        for (int j = 0; j < circlesList.Count; j++)
+                        foreach (Circle element in circleListGroup[i].list)
                         {
-                            if (circlesList[j].initialXLocation == newCircle.initialXLocation && circlesList[j].initalYLocation == newCircle.initalYLocation)
+                            if (element.x == newCircle.initialXLocation && element.y == newCircle.initalYLocation)
                             {
-                                circlesWithIdenticalInitialCoordinatesList.Add(circlesList[j]);
+                                float circleListCount = circleListGroup[i].list.Count();
+
+                                float degrees = 45;
+                                //float multiple = 8;
+                                float radius = 50 * ((circleListGroup[i].list.Count() - 1) / 8 + 1);
+                                //if (circleListCount - 1 % multiple == 0)
+                                //{
+                                //    radius = 50 * ((circleListCount - 1) / (degrees / multiple) + 1);
+                                //}
+                                float radian = Convert.ToSingle(degrees * Math.PI / 180);
+                                float multiplier = circleListCount;
+
+                                float newX = Convert.ToSingle(element.x + radius * Math.Cos(radian * (multiplier)));
+                                float newY = Convert.ToSingle(element.y + radius * Math.Sin(radian * (multiplier)));
+
+                                newCircle.x = newX;
+                                newCircle.y = newY;
+                                newCircle.isMovedFromInitialLocation = true;
+
+                                circleListGroup[i].list.Add(newCircle);
+                                break;
                             }
                         }
-
-                        float multiplier = circlesWithIdenticalInitialCoordinatesList.Count();
-
-                        float newX = Convert.ToSingle(circlesList[i].x + radius * Math.Cos(radian * (multiplier)));
-                        float newY = Convert.ToSingle(circlesList[i].y + radius * Math.Sin(radian * (multiplier)));
-
-                        newCircle.x = newX;
-                        newCircle.y = newY;
-                        newCircle.isMovedFromInitialLocation = true;
-
-                        break;
                     }
+                    
                 }
-                circlesList.Add(newCircle);
 
+                IList<Circle> list = new List<Circle>();
+                list.Add(newCircle);
+                CircleList circleList = new CircleList(xInputBoxValue, yInputBoxValue, list);
+                circleListGroup.Add(circleList);
+                
                 panel.DrawEllipse(redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
                 panel.FillEllipse(brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
             }
