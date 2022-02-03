@@ -82,7 +82,8 @@ namespace Algo
         private void _placeUsers()
         {
             _linkspotUsersList.ForEach((LinkspotUser user) =>
-            {   
+            {
+                Thread.Sleep(200);
                 PointF loc = new PointF(user.LatLngPositionX, user.LatLngPositionY);
                 RectangleF rect = new RectangleF(loc, _defaultSize);
 
