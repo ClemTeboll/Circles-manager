@@ -12,9 +12,88 @@ namespace Algo
 {
     public partial class Form1 : Form
     {
+        List<LinkspotUser> _linkspotUsersList = new List<LinkspotUser> {
+            new LinkspotUser(320, 95, true),
+            new LinkspotUser(305, 100, true),
+            new LinkspotUser(297, 102, true),
+            new LinkspotUser(315, 109, true),
+            new LinkspotUser(290, 113, true),
+            new LinkspotUser(330, 120, true),
+            new LinkspotUser(308, 97, true),
+            new LinkspotUser(300, 100, false),
+            new LinkspotUser(310, 110, true),
+            new LinkspotUser(300, 104, true),
+            new LinkspotUser(350, 170, true),
+            new LinkspotUser(380, 140, true),
+            new LinkspotUser(350, 150, true),
+            new LinkspotUser(396, 205, true),
+            new LinkspotUser(403, 210, true),
+            new LinkspotUser(388, 195, false),
+            new LinkspotUser(415, 209, true),
+            new LinkspotUser(398, 207, true),
+            new LinkspotUser(400, 200, true),
+            new LinkspotUser(408, 197, true),
+            new LinkspotUser(399, 200, false),
+            new LinkspotUser(410, 210, true),
+            new LinkspotUser(400, 204, true),
+            new LinkspotUser(370, 95, true),
+            new LinkspotUser(375, 100, true),
+            new LinkspotUser(367, 102, true),
+            new LinkspotUser(385, 109, true),
+            new LinkspotUser(360, 113, true),
+            new LinkspotUser(400, 120, true),
+            new LinkspotUser(378, 97, true),
+            new LinkspotUser(370, 100, false),
+            new LinkspotUser(380, 110, true),
+            new LinkspotUser(370, 104, true),
+        };
+
+        Pen _redPen;
+        SolidBrush _brushForRedCircle;
+        Graphics _panel;
+        SizeF _defaultSize;
+
         public Form1()
         {
             InitializeComponent();
+            _redPen = new Pen(Color.Red);
+            _brushForRedCircle = new SolidBrush(Color.Red);
+            _panel = DrawSpace.CreateGraphics();
+            _defaultSize = new SizeF(10, 10);
+        }
+
+        public class LinkspotUser
+        {
+            public float LatLngPositionX, LatLngPositionY;
+            public bool isVisible;
+
+            public LinkspotUser(
+                float posX,
+                float pozY,
+                bool visibility
+            )
+            {
+                LatLngPositionX = posX;
+                LatLngPositionY = pozY;
+                isVisible = visibility;
+            }
+        }
+
+        private void _placeUsers()
+        {
+            _linkspotUsersList.ForEach((LinkspotUser user) =>
+            {   
+                PointF loc = new PointF(user.LatLngPositionX, user.LatLngPositionY);
+                RectangleF rect = new RectangleF(loc, _defaultSize);
+
+                _panel.DrawEllipse(_redPen, rect);
+                _panel.FillEllipse(_brushForRedCircle, rect);
+            });
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            _placeUsers();
         }
 
         public class Circle
