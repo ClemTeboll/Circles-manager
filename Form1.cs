@@ -96,20 +96,20 @@ namespace Algo
                     {
                         foreach (Circle element in circleListGroup[i].list)
                         {
+                            float circleListCount = circleListGroup[i].list.Count();
+
+                            float degrees = 45;
+                            //float multiple = 8;
+                            float radius = 50 * ((circleListGroup[i].list.Count() - 1) / 8 + 1);
+                            //if (circleListCount - 1 % multiple == 0)
+                            //{
+                            //    radius = 50 * ((circleListCount - 1) / (degrees / multiple) + 1);
+                            //}
+                            float radian = Convert.ToSingle(degrees * Math.PI / 180);
+                            float multiplier = circleListCount;
+
                             if (element.x == newCircle.initialXLocation && element.y == newCircle.initalYLocation)
                             {
-                                float circleListCount = circleListGroup[i].list.Count();
-
-                                float degrees = 45;
-                                //float multiple = 8;
-                                float radius = 50 * ((circleListGroup[i].list.Count() - 1) / 8 + 1);
-                                //if (circleListCount - 1 % multiple == 0)
-                                //{
-                                //    radius = 50 * ((circleListCount - 1) / (degrees / multiple) + 1);
-                                //}
-                                float radian = Convert.ToSingle(degrees * Math.PI / 180);
-                                float multiplier = circleListCount;
-
                                 float newX = Convert.ToSingle(element.x + radius * Math.Cos(radian * (multiplier)));
                                 float newY = Convert.ToSingle(element.y + radius * Math.Sin(radian * (multiplier)));
 
@@ -120,16 +120,15 @@ namespace Algo
                                 circleListGroup[i].list.Add(newCircle);
                                 break;
                             }
+                            
                         }
                     }
-                    
                 }
-
                 IList<Circle> list = new List<Circle>();
                 list.Add(newCircle);
                 CircleList circleList = new CircleList(xInputBoxValue, yInputBoxValue, list);
                 circleListGroup.Add(circleList);
-                
+
                 panel.DrawEllipse(redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
                 panel.FillEllipse(brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
             }
