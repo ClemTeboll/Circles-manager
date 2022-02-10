@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -48,8 +49,11 @@ namespace Algo
             new LinkspotUser(370, 104, true),
         };
 
+
         Pen _redPen;
+        Pen _greenPen;
         SolidBrush _brushForRedCircle;
+        SolidBrush _brushForGreenCircle;
         Graphics _panel;
         SizeF _defaultSize;
 
@@ -57,7 +61,9 @@ namespace Algo
         {
             InitializeComponent();
             _redPen = new Pen(Color.Red);
+            _greenPen = new Pen(Color.Green);
             _brushForRedCircle = new SolidBrush(Color.Red);
+            _brushForGreenCircle = new SolidBrush(Color.Green);
             _panel = DrawSpace.CreateGraphics();
             _defaultSize = new SizeF(10, 10);
         }
@@ -68,28 +74,88 @@ namespace Algo
             public bool isVisible;
 
             public LinkspotUser(
-                float posX,
-                float pozY,
+                float xPosition,
+                float yPosition,
                 bool visibility
             )
             {
-                LatLngPositionX = posX;
-                LatLngPositionY = pozY;
+                LatLngPositionX = xPosition;
+                LatLngPositionY = yPosition;
                 isVisible = visibility;
             }
         }
 
+        float radius = 50;
+
         private void _placeUsers()
         {
-            _linkspotUsersList.ForEach((LinkspotUser user) =>
+            foreach (LinkspotUser linkspotUser in _linkspotUsersList)
             {
                 Thread.Sleep(200);
-                PointF loc = new PointF(user.LatLngPositionX, user.LatLngPositionY);
-                RectangleF rect = new RectangleF(loc, _defaultSize);
+                //PointF location = new PointF(linkspotUser.LatLngPositionX, linkspotUser.LatLngPositionY);
+                //RectangleF rectangle = new RectangleF(location, _defaultSize);
 
-                _panel.DrawEllipse(_redPen, rect);
-                _panel.FillEllipse(_brushForRedCircle, rect);
-            });
+                List<LinkspotUser> _previousLinkspotUsersList = new List<LinkspotUser>(_linkspotUsersList);
+                _previousLinkspotUsersList.Remove(linkspotUser);
+
+                foreach (LinkspotUser previousLinkspotUser in _previousLinkspotUsersList)
+                {
+                    double distance = Math.Sqrt((linkspotUser.LatLngPositionX - previousLinkspotUser.LatLngPositionX) + (linkspotUser.LatLngPositionY - previousLinkspotUser.LatLngPositionY));
+                    
+                    //float radius = 50 * ((_previousLinkspotUsersList.Count() - 1) / 8 + 1);
+                    //float radian = Convert.ToSingle(45 * Math.PI / 180);
+                    //float multiplier = _previousLinkspotUsersList.Count();
+
+                    if (distance <= radius * 2)
+                    {
+                        //linkspotUser.LatLngPositionX = Convert.ToSingle(previousLinkspotUser.LatLngPositionX + radius * Math.Cos(radian * (multiplier)));
+                        //linkspotUser.LatLngPositionY = Convert.ToSingle(previousLinkspotUser.LatLngPositionX + radius * Math.Sin(radian * (multiplier)));
+
+
+                        PointF location = new PointF(linkspotUser.LatLngPositionX, linkspotUser.LatLngPositionY);
+                        RectangleF rectangle = new RectangleF(location, _defaultSize);
+
+                        _panel.DrawEllipse(_greenPen, rectangle);
+                        _panel.FillEllipse(_brushForGreenCircle, rectangle);
+
+                        break;
+                    }
+                    else
+                    {
+                        PointF location = new PointF(linkspotUser.LatLngPositionX, linkspotUser.LatLngPositionY);
+                        RectangleF rectangle = new RectangleF(location, _defaultSize);
+
+                        _panel.DrawEllipse(_redPen, rectangle);
+                        _panel.FillEllipse(_brushForRedCircle, rectangle);
+                        break;
+                    }
+                }
+            }
+
+            
+
+            //foreach (LinkspotUser linkspotUser in _linkspotUsersList)
+            //{
+            //    PointF location = new PointF(linkspotUser.LatLngPositionX, linkspotUser.LatLngPositionY);
+            //    RectangleF rectangle = new RectangleF(location, _defaultSize);
+
+            //    var _previousLinkspotUsersList = new List<LinkspotUser>(_linkspotUsersList);
+            //    _previousLinkspotUsersList.Remove(linkspotUser);
+
+            //    foreach (LinkspotUser previousLinkspotUser in _previousLinkspotUsersList)
+            //    {
+            //        double distance = Math.Sqrt(Math.Pow((linkspotUser.LatLngPositionX + previousLinkspotUser.LatLngPositionX), 2) + Math.Pow((linkspotUser.LatLngPositionY - previousLinkspotUser.LatLngPositionY), 2));
+
+            //        if (distance <= radius * 2)
+            //        {
+            //            linkspotUser.LatLngPositionX = previousLinkspotUser.LatLngPositionX + 10;
+            //            linkspotUser.LatLngPositionY = previousLinkspotUser.LatLngPositionY + 10;
+
+            //            _panel.DrawEllipse(_redPen, rectangle);
+            //            _panel.FillEllipse(_brushForRedCircle, rectangle);
+            //        }
+            //    }
+            //}
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -144,16 +210,8 @@ namespace Algo
 
         private void BtnCreateCircle_Click(object sender, EventArgs e)
         {
-            // Récupération des données des inputs
             float xInputBoxValue = float.Parse(XInputBox.Text);
             float yInputBoxValue = float.Parse(YInputBox.Text);
-
-
-            // Paramétrage de la création des cercles et du panel pour les afficher
-            Pen redPen = new Pen(Color.Red);
-            SolidBrush brushForRedCircle = new SolidBrush(Color.Red);
-            Graphics panel = DrawSpace.CreateGraphics();
-
 
             if (circleListGroup.Count == 0)
             {
@@ -162,9 +220,9 @@ namespace Algo
                 list.Add(newCircle);
                 CircleList circleList = new CircleList(xInputBoxValue, yInputBoxValue, list);
                 circleListGroup.Add(circleList);
-                
-                panel.DrawEllipse(redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
-                panel.FillEllipse(brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
+
+                _panel.DrawEllipse(_redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
+                _panel.FillEllipse(_brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
             }
             else
             {
@@ -200,7 +258,7 @@ namespace Algo
                                 circleListGroup[i].list.Add(newCircle);
                                 break;
                             }
-                            
+
                         }
                     }
                 }
@@ -209,8 +267,8 @@ namespace Algo
                 CircleList circleList = new CircleList(xInputBoxValue, yInputBoxValue, list);
                 circleListGroup.Add(circleList);
 
-                panel.DrawEllipse(redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
-                panel.FillEllipse(brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
+                _panel.DrawEllipse(_redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
+                _panel.FillEllipse(_brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
             }
         }
 
