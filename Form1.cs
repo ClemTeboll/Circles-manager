@@ -55,6 +55,7 @@ namespace Algo
         SolidBrush _brushForRedCircle;
         SolidBrush _brushForGreenCircle;
         Graphics _panel;
+        float _defaultRadius;
         SizeF _defaultSize;
 
         public Form1()
@@ -65,7 +66,9 @@ namespace Algo
             _brushForRedCircle = new SolidBrush(Color.Red);
             _brushForGreenCircle = new SolidBrush(Color.Green);
             _panel = DrawSpace.CreateGraphics();
-            _defaultSize = new SizeF(10, 10);
+            _defaultRadius = 5;
+            _defaultSize = new SizeF(_defaultRadius * 2, _defaultRadius * 2);
+            
         }
 
         public class LinkspotUser
@@ -85,82 +88,45 @@ namespace Algo
             }
         }
 
-        float radius = 50;
-
-        private void _placeUsers()
+        private void _changeUsersPosition()
         {
             foreach (LinkspotUser linkspotUser in _linkspotUsersList)
             {
-                Thread.Sleep(200);
-                //PointF location = new PointF(linkspotUser.LatLngPositionX, linkspotUser.LatLngPositionY);
-                //RectangleF rectangle = new RectangleF(location, _defaultSize);
-
                 List<LinkspotUser> _previousLinkspotUsersList = new List<LinkspotUser>(_linkspotUsersList);
                 _previousLinkspotUsersList.Remove(linkspotUser);
 
                 foreach (LinkspotUser previousLinkspotUser in _previousLinkspotUsersList)
                 {
-                    double distance = Math.Sqrt((linkspotUser.LatLngPositionX - previousLinkspotUser.LatLngPositionX) + (linkspotUser.LatLngPositionY - previousLinkspotUser.LatLngPositionY));
-                    
-                    //float radius = 50 * ((_previousLinkspotUsersList.Count() - 1) / 8 + 1);
-                    //float radian = Convert.ToSingle(45 * Math.PI / 180);
-                    //float multiplier = _previousLinkspotUsersList.Count();
+                    double distance = Math.Sqrt(Math.Pow((linkspotUser.LatLngPositionX - previousLinkspotUser.LatLngPositionX), 2) + Math.Pow((linkspotUser.LatLngPositionY - previousLinkspotUser.LatLngPositionY), 2));
+                    float floatedDistance = Convert.ToSingle(distance);
 
-                    if (distance <= radius * 2)
+                    if (floatedDistance <= _defaultRadius * 2)
                     {
-                        //linkspotUser.LatLngPositionX = Convert.ToSingle(previousLinkspotUser.LatLngPositionX + radius * Math.Cos(radian * (multiplier)));
-                        //linkspotUser.LatLngPositionY = Convert.ToSingle(previousLinkspotUser.LatLngPositionX + radius * Math.Sin(radian * (multiplier)));
-
-
-                        PointF location = new PointF(linkspotUser.LatLngPositionX, linkspotUser.LatLngPositionY);
-                        RectangleF rectangle = new RectangleF(location, _defaultSize);
-
-                        _panel.DrawEllipse(_greenPen, rectangle);
-                        _panel.FillEllipse(_brushForGreenCircle, rectangle);
-
-                        break;
-                    }
-                    else
-                    {
-                        PointF location = new PointF(linkspotUser.LatLngPositionX, linkspotUser.LatLngPositionY);
-                        RectangleF rectangle = new RectangleF(location, _defaultSize);
-
-                        _panel.DrawEllipse(_redPen, rectangle);
-                        _panel.FillEllipse(_brushForRedCircle, rectangle);
-                        break;
+                        previousLinkspotUser.LatLngPositionX += _defaultRadius;
+                        previousLinkspotUser.LatLngPositionY += _defaultRadius;
                     }
                 }
             }
+        }
 
-            
+        private void _drawUsers()
+        {
+            foreach (LinkspotUser linkspotUser in _linkspotUsersList)
+            {
+                Thread.Sleep(200);
 
-            //foreach (LinkspotUser linkspotUser in _linkspotUsersList)
-            //{
-            //    PointF location = new PointF(linkspotUser.LatLngPositionX, linkspotUser.LatLngPositionY);
-            //    RectangleF rectangle = new RectangleF(location, _defaultSize);
+                PointF location = new PointF(linkspotUser.LatLngPositionX, linkspotUser.LatLngPositionY);
+                RectangleF rectangle = new RectangleF(location, _defaultSize);
 
-            //    var _previousLinkspotUsersList = new List<LinkspotUser>(_linkspotUsersList);
-            //    _previousLinkspotUsersList.Remove(linkspotUser);
-
-            //    foreach (LinkspotUser previousLinkspotUser in _previousLinkspotUsersList)
-            //    {
-            //        double distance = Math.Sqrt(Math.Pow((linkspotUser.LatLngPositionX + previousLinkspotUser.LatLngPositionX), 2) + Math.Pow((linkspotUser.LatLngPositionY - previousLinkspotUser.LatLngPositionY), 2));
-
-            //        if (distance <= radius * 2)
-            //        {
-            //            linkspotUser.LatLngPositionX = previousLinkspotUser.LatLngPositionX + 10;
-            //            linkspotUser.LatLngPositionY = previousLinkspotUser.LatLngPositionY + 10;
-
-            //            _panel.DrawEllipse(_redPen, rectangle);
-            //            _panel.FillEllipse(_brushForRedCircle, rectangle);
-            //        }
-            //    }
-            //}
+                _panel.DrawEllipse(_greenPen, rectangle);
+                _panel.FillEllipse(_brushForGreenCircle, rectangle);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            _placeUsers();
+            _changeUsersPosition();
+            _drawUsers();
         }
 
         public class Circle
