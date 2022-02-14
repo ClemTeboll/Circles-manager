@@ -88,6 +88,30 @@ namespace Algo
             }
         }
 
+        public class UserProfileList
+        {
+            public float x, y;
+            public bool isMovedFromInitialLocation;
+            public IList<LinkspotUser> list;
+
+            public UserProfileList(
+                float XInitialLocation,
+                float YInitialLocation,
+                bool ifIsMovedFromInitialLocation,
+                IList<LinkspotUser> thisUserProfileList
+            )
+            {
+                x = XInitialLocation;
+                y = YInitialLocation;
+                isMovedFromInitialLocation = ifIsMovedFromInitialLocation;
+                list = thisUserProfileList;
+            }
+
+        }
+
+        IList<UserProfileList> userProfileListGroup = new List<UserProfileList>();
+
+
         private void _changeUsersPosition()
         {
             foreach (LinkspotUser linkspotUser in _linkspotUsersList)
@@ -104,6 +128,38 @@ namespace Algo
                     {
                         previousLinkspotUser.LatLngPositionX += _defaultRadius;
                         previousLinkspotUser.LatLngPositionY += _defaultRadius;
+
+                        if (userProfileListGroup.Count() == 0)
+                        {
+                            IList<LinkspotUser> list = new List<LinkspotUser>();
+                            list.Add(previousLinkspotUser);
+                            UserProfileList userProfileList = new UserProfileList(previousLinkspotUser.LatLngPositionX, previousLinkspotUser.LatLngPositionY, false, list);
+                            userProfileListGroup.Add(userProfileList);
+                        }
+                        else
+                        {
+                            for (int i = 0; i < userProfileListGroup.Count(); i++)
+                            {
+                                double newDistance = Math.Sqrt(Math.Pow((previousLinkspotUser.LatLngPositionX - userProfileListGroup[i].x), 2) + Math.Pow((previousLinkspotUser.LatLngPositionY - userProfileListGroup[i].y), 2));
+                                float floatedNewDistance = Convert.ToSingle(newDistance);
+
+                                if (floatedNewDistance < _defaultRadius * 2)
+                                {
+                                    float degrees = 45;
+                                    float radian = Convert.ToSingle(degrees * Math.PI / 180);
+                                    float multiplier = userProfileListGroup[i].list.Count();
+
+                                    foreach (LinkspotUser element in userProfileListGroup[i].list)
+                                    {
+                                        previousLinkspotUser.LatLngPositionX = Convert.ToSingle(element.LatLngPositionX + (_defaultRadius * 10) * Math.Cos(radian * (multiplier)));
+                                        previousLinkspotUser.LatLngPositionY = Convert.ToSingle(element.LatLngPositionY + (_defaultRadius * 10) * Math.Sin(radian * (multiplier)));
+
+                                        userProfileListGroup[i].list.Add(previousLinkspotUser);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
