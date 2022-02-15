@@ -14,39 +14,39 @@ namespace Algo
     public partial class Form1 : Form
     {
         List<LinkspotUser> _linkspotUsersList = new List<LinkspotUser> {
-            new LinkspotUser(320, 95, true),
-            new LinkspotUser(305, 100, true),
-            new LinkspotUser(297, 102, true),
-            new LinkspotUser(315, 109, true),
-            new LinkspotUser(290, 113, true),
-            new LinkspotUser(330, 120, true),
-            new LinkspotUser(308, 97, true),
-            new LinkspotUser(300, 100, false),
-            new LinkspotUser(310, 110, true),
-            new LinkspotUser(300, 104, true),
-            new LinkspotUser(350, 170, true),
-            new LinkspotUser(380, 140, true),
-            new LinkspotUser(350, 150, true),
-            new LinkspotUser(396, 205, true),
-            new LinkspotUser(403, 210, true),
-            new LinkspotUser(388, 195, false),
-            new LinkspotUser(415, 209, true),
-            new LinkspotUser(398, 207, true),
-            new LinkspotUser(400, 200, true),
-            new LinkspotUser(408, 197, true),
-            new LinkspotUser(399, 200, false),
-            new LinkspotUser(410, 210, true),
-            new LinkspotUser(400, 204, true),
-            new LinkspotUser(370, 95, true),
-            new LinkspotUser(375, 100, true),
-            new LinkspotUser(367, 102, true),
-            new LinkspotUser(385, 109, true),
-            new LinkspotUser(360, 113, true),
-            new LinkspotUser(400, 120, true),
-            new LinkspotUser(378, 97, true),
-            new LinkspotUser(370, 100, false),
-            new LinkspotUser(380, 110, true),
-            new LinkspotUser(370, 104, true),
+            new LinkspotUser(320, 95, false, true, 320, 95),
+            new LinkspotUser(305, 100, false, true, 305, 100),
+            new LinkspotUser(297, 102, false, true, 297, 102),
+            new LinkspotUser(315, 109, false, true, 315, 109),
+            new LinkspotUser(290, 113, false, true, 290, 113),
+            new LinkspotUser(330, 120, false, true, 330, 120),
+            new LinkspotUser(308, 97, false, true, 308, 97),
+            new LinkspotUser(300, 100, false, false, 300, 100),
+            new LinkspotUser(310, 110, false, true, 310, 110),
+            new LinkspotUser(300, 104, false, true, 300, 104),
+            new LinkspotUser(350, 170, false, true, 350, 170),
+            new LinkspotUser(380, 140, false, true, 380, 140),
+            new LinkspotUser(350, 150, false, true, 350, 150),
+            new LinkspotUser(396, 205, false, true, 396, 205),
+            new LinkspotUser(403, 210, false, true, 403, 210),
+            new LinkspotUser(388, 195, false, false, 388, 195),
+            new LinkspotUser(415, 209, false, true, 415, 209),
+            new LinkspotUser(398, 207, false, true, 398, 207),
+            new LinkspotUser(400, 200, false, true, 400, 200),
+            new LinkspotUser(408, 197, false, true, 408, 197),
+            new LinkspotUser(399, 200, false, false, 399, 200),
+            new LinkspotUser(410, 210, false, true, 410, 210),
+            new LinkspotUser(400, 204, false, true, 400, 204),
+            new LinkspotUser(370, 95, false, true, 370, 95),
+            new LinkspotUser(375, 100, false, true, 375, 100),
+            new LinkspotUser(367, 102, false, true, 367, 102),
+            new LinkspotUser(385, 109, false, true, 385, 109),
+            new LinkspotUser(360, 113, false, true, 360, 113),
+            new LinkspotUser(400, 120, false, true, 400, 120),
+            new LinkspotUser(378, 97, false, true, 378, 97),
+            new LinkspotUser(370, 100, false, false, 370, 100),
+            new LinkspotUser(380, 110, false, true, 380, 110),
+            new LinkspotUser(370, 104, false, true, 370, 104)
         };
 
 
@@ -68,22 +68,29 @@ namespace Algo
             _panel = DrawSpace.CreateGraphics();
             _defaultRadius = 5;
             _defaultSize = new SizeF(_defaultRadius * 2, _defaultRadius * 2);
-            
+
         }
 
         public class LinkspotUser
         {
-            public float LatLngPositionX, LatLngPositionY;
+            public float LatLngPositionX, LatLngPositionY, initialLatLngPositionX, initialLatLngPositionY;
+            public bool isMovedFromInitialLocation;
             public bool isVisible;
 
             public LinkspotUser(
                 float xPosition,
                 float yPosition,
-                bool visibility
+                bool ifIsMovedFromInitialLocation,
+                bool visibility,
+                float thisInitialLatLngPositionX,
+                float thisInitialLatLngPositionY
             )
             {
                 LatLngPositionX = xPosition;
                 LatLngPositionY = yPosition;
+                isMovedFromInitialLocation = ifIsMovedFromInitialLocation;
+                initialLatLngPositionX = thisInitialLatLngPositionX;
+                initialLatLngPositionY = thisInitialLatLngPositionY;
                 isVisible = visibility;
             }
         }
@@ -91,19 +98,16 @@ namespace Algo
         public class UserProfileList
         {
             public float x, y;
-            public bool isMovedFromInitialLocation;
             public IList<LinkspotUser> list;
 
             public UserProfileList(
                 float XInitialLocation,
                 float YInitialLocation,
-                bool ifIsMovedFromInitialLocation,
                 IList<LinkspotUser> thisUserProfileList
             )
             {
                 x = XInitialLocation;
                 y = YInitialLocation;
-                isMovedFromInitialLocation = ifIsMovedFromInitialLocation;
                 list = thisUserProfileList;
             }
 
@@ -133,30 +137,27 @@ namespace Algo
                         {
                             IList<LinkspotUser> list = new List<LinkspotUser>();
                             list.Add(previousLinkspotUser);
-                            UserProfileList userProfileList = new UserProfileList(previousLinkspotUser.LatLngPositionX, previousLinkspotUser.LatLngPositionY, false, list);
+                            UserProfileList userProfileList = new UserProfileList(previousLinkspotUser.LatLngPositionX, previousLinkspotUser.LatLngPositionY, list);
                             userProfileListGroup.Add(userProfileList);
                         }
                         else
                         {
-                            for (int i = 0; i < userProfileListGroup.Count(); i++)
+                            foreach (UserProfileList userProfileList in userProfileListGroup)
                             {
-                                double newDistance = Math.Sqrt(Math.Pow((previousLinkspotUser.LatLngPositionX - userProfileListGroup[i].x), 2) + Math.Pow((previousLinkspotUser.LatLngPositionY - userProfileListGroup[i].y), 2));
+                                double newDistance = Math.Sqrt(Math.Pow((previousLinkspotUser.LatLngPositionX - userProfileList.x), 2) + Math.Pow((previousLinkspotUser.LatLngPositionY - userProfileList.y), 2));
                                 float floatedNewDistance = Convert.ToSingle(newDistance);
 
                                 if (floatedNewDistance < _defaultRadius * 2)
                                 {
                                     float degrees = 45;
                                     float radian = Convert.ToSingle(degrees * Math.PI / 180);
-                                    float multiplier = userProfileListGroup[i].list.Count();
+                                    float multiplier = userProfileList.list.Count();
 
-                                    foreach (LinkspotUser element in userProfileListGroup[i].list)
-                                    {
-                                        previousLinkspotUser.LatLngPositionX = Convert.ToSingle(element.LatLngPositionX + (_defaultRadius * 10) * Math.Cos(radian * (multiplier)));
-                                        previousLinkspotUser.LatLngPositionY = Convert.ToSingle(element.LatLngPositionY + (_defaultRadius * 10) * Math.Sin(radian * (multiplier)));
+                                    previousLinkspotUser.LatLngPositionX = Convert.ToSingle(userProfileList.x + (_defaultRadius * 3) * Math.Cos(radian * (multiplier)));
+                                    previousLinkspotUser.LatLngPositionY = Convert.ToSingle(userProfileList.y + (_defaultRadius * 3) * Math.Sin(radian * (multiplier)));
+                                    previousLinkspotUser.isMovedFromInitialLocation = true;
 
-                                        userProfileListGroup[i].list.Add(previousLinkspotUser);
-                                        break;
-                                    }
+                                    userProfileList.list.Add(previousLinkspotUser);
                                 }
                             }
                         }
@@ -169,7 +170,7 @@ namespace Algo
         {
             foreach (LinkspotUser linkspotUser in _linkspotUsersList)
             {
-                Thread.Sleep(200);
+                Thread.Sleep(400);
 
                 PointF location = new PointF(linkspotUser.LatLngPositionX, linkspotUser.LatLngPositionY);
                 RectangleF rectangle = new RectangleF(location, _defaultSize);
@@ -179,8 +180,18 @@ namespace Algo
             }
         }
 
+        private void _kMeansAlgorithm()
+        {
+            // Positionnement des k centroides
+            // Pour chaque itération
+                // associer chaque point du dataset au centroïde le plus proche,
+                // déplacer les k centroïdes vers les barycentres des points dont ils sont les plus proches.
+            // L'algorithme s'arrête lorsqu'on a atteint le nombre maximum d'itérations ou lorsque les centroïdes ne bougent plus.
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
+            _changeUsersPosition();
             _changeUsersPosition();
             _drawUsers();
         }
