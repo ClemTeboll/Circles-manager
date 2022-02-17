@@ -68,7 +68,6 @@ namespace Algo
             _panel = DrawSpace.CreateGraphics();
             _defaultRadius = 5;
             _defaultSize = new SizeF(_defaultRadius * 2, _defaultRadius * 2);
-
         }
 
         public class LinkspotUser
@@ -116,6 +115,35 @@ namespace Algo
         IList<UserProfileList> userProfileListGroup = new List<UserProfileList>();
 
 
+        private void _calculateUserPositionInACircle(LinkspotUser thisUser)
+        {
+            foreach (UserProfileList userProfileList in userProfileListGroup.ToList())
+            {
+                double newDistance = Math.Sqrt(Math.Pow((thisUser.LatLngPositionX - userProfileList.x), 2) + Math.Pow((thisUser.LatLngPositionY - userProfileList.y), 2));
+                float floatedNewDistance = Convert.ToSingle(newDistance);
+
+                if (floatedNewDistance < _defaultRadius * 4)
+                {
+                    float degrees = 45;
+                    float radian = Convert.ToSingle(degrees * Math.PI / 180);
+                    float multiplier = userProfileList.list.Count();
+
+                    thisUser.LatLngPositionX = Convert.ToSingle(userProfileList.x + (_defaultRadius * 3) * Math.Cos(radian * (multiplier)));
+                    thisUser.LatLngPositionY = Convert.ToSingle(userProfileList.y + (_defaultRadius * 3) * Math.Sin(radian * (multiplier)));
+                    thisUser.isMovedFromInitialLocation = true;
+
+                    userProfileList.list.Add(thisUser);
+                }
+                //else
+                //{
+                //    IList<LinkspotUser> list = new List<LinkspotUser>();
+                //    list.Add(thisUser);
+                //    UserProfileList profileList = new UserProfileList(thisUser.LatLngPositionX, thisUser.LatLngPositionY, list);
+                //    userProfileListGroup.Add(profileList);
+                //}
+            }
+        }
+
         private void _changeUsersPosition()
         {
             foreach (LinkspotUser linkspotUser in _linkspotUsersList)
@@ -130,9 +158,6 @@ namespace Algo
 
                     if (floatedDistance <= _defaultRadius * 2)
                     {
-                        previousLinkspotUser.LatLngPositionX += _defaultRadius;
-                        previousLinkspotUser.LatLngPositionY += _defaultRadius;
-
                         if (userProfileListGroup.Count() == 0)
                         {
                             IList<LinkspotUser> list = new List<LinkspotUser>();
@@ -142,24 +167,7 @@ namespace Algo
                         }
                         else
                         {
-                            foreach (UserProfileList userProfileList in userProfileListGroup)
-                            {
-                                double newDistance = Math.Sqrt(Math.Pow((previousLinkspotUser.LatLngPositionX - userProfileList.x), 2) + Math.Pow((previousLinkspotUser.LatLngPositionY - userProfileList.y), 2));
-                                float floatedNewDistance = Convert.ToSingle(newDistance);
-
-                                if (floatedNewDistance < _defaultRadius * 2)
-                                {
-                                    float degrees = 45;
-                                    float radian = Convert.ToSingle(degrees * Math.PI / 180);
-                                    float multiplier = userProfileList.list.Count();
-
-                                    previousLinkspotUser.LatLngPositionX = Convert.ToSingle(userProfileList.x + (_defaultRadius * 3) * Math.Cos(radian * (multiplier)));
-                                    previousLinkspotUser.LatLngPositionY = Convert.ToSingle(userProfileList.y + (_defaultRadius * 3) * Math.Sin(radian * (multiplier)));
-                                    previousLinkspotUser.isMovedFromInitialLocation = true;
-
-                                    userProfileList.list.Add(previousLinkspotUser);
-                                }
-                            }
+                            _calculateUserPositionInACircle(previousLinkspotUser);
                         }
                     }
                 }
@@ -180,18 +188,8 @@ namespace Algo
             }
         }
 
-        private void _kMeansAlgorithm()
-        {
-            // Positionnement des k centroides
-            // Pour chaque itération
-                // associer chaque point du dataset au centroïde le plus proche,
-                // déplacer les k centroïdes vers les barycentres des points dont ils sont les plus proches.
-            // L'algorithme s'arrête lorsqu'on a atteint le nombre maximum d'itérations ou lorsque les centroïdes ne bougent plus.
-        }
-
         private void button1_Click(object sender, EventArgs e)
         {
-            _changeUsersPosition();
             _changeUsersPosition();
             _drawUsers();
         }
