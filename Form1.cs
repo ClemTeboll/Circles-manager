@@ -113,7 +113,9 @@ namespace Algo
         }
 
         IList<UserProfileList> userProfileListGroup = new List<UserProfileList>();
-
+        
+        float degrees = 45;
+        float defaultRadiusMultiplier = 3;
 
         private void _calculateUserPositionInACircle(LinkspotUser thisUser)
         {
@@ -122,25 +124,26 @@ namespace Algo
                 double newDistance = Math.Sqrt(Math.Pow((thisUser.LatLngPositionX - userProfileList.x), 2) + Math.Pow((thisUser.LatLngPositionY - userProfileList.y), 2));
                 float floatedNewDistance = Convert.ToSingle(newDistance);
 
+
+
                 if (floatedNewDistance < _defaultRadius * 4)
                 {
-                    float degrees = 45;
                     float radian = Convert.ToSingle(degrees * Math.PI / 180);
-                    float multiplier = userProfileList.list.Count();
+                    float cosinusSinusMultiplier = userProfileList.list.Count();
 
-                    thisUser.LatLngPositionX = Convert.ToSingle(userProfileList.x + (_defaultRadius * 3) * Math.Cos(radian * (multiplier)));
-                    thisUser.LatLngPositionY = Convert.ToSingle(userProfileList.y + (_defaultRadius * 3) * Math.Sin(radian * (multiplier)));
+                    thisUser.LatLngPositionX = Convert.ToSingle(userProfileList.x + (_defaultRadius * defaultRadiusMultiplier) * Math.Cos(radian * (cosinusSinusMultiplier)));
+                    thisUser.LatLngPositionY = Convert.ToSingle(userProfileList.y + (_defaultRadius * defaultRadiusMultiplier) * Math.Sin(radian * (cosinusSinusMultiplier)));
                     thisUser.isMovedFromInitialLocation = true;
 
                     userProfileList.list.Add(thisUser);
                 }
-                //else
-                //{
-                //    IList<LinkspotUser> list = new List<LinkspotUser>();
-                //    list.Add(thisUser);
-                //    UserProfileList profileList = new UserProfileList(thisUser.LatLngPositionX, thisUser.LatLngPositionY, list);
-                //    userProfileListGroup.Add(profileList);
-                //}
+                else
+                {
+                    IList<LinkspotUser> list = new List<LinkspotUser>();
+                    list.Add(thisUser);
+                    UserProfileList profileList = new UserProfileList(thisUser.LatLngPositionX, thisUser.LatLngPositionY, list);
+                    userProfileListGroup.Add(profileList);
+                }
             }
         }
 
