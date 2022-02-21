@@ -125,7 +125,6 @@ namespace Algo
                 float floatedNewDistance = Convert.ToSingle(newDistance);
 
 
-
                 if (floatedNewDistance < _defaultRadius * 4)
                 {
                     float radian = Convert.ToSingle(degrees * Math.PI / 180);
@@ -167,6 +166,7 @@ namespace Algo
                             list.Add(previousLinkspotUser);
                             UserProfileList userProfileList = new UserProfileList(previousLinkspotUser.LatLngPositionX, previousLinkspotUser.LatLngPositionY, list);
                             userProfileListGroup.Add(userProfileList);
+                            continue;
                         }
                         else
                         {
