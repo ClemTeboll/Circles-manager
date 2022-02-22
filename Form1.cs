@@ -134,14 +134,14 @@ namespace Algo
                     thisUser.LatLngPositionY = Convert.ToSingle(userProfileList.y + (_defaultRadius * defaultRadiusMultiplier) * Math.Sin(radian * (cosinusSinusMultiplier)));
                     thisUser.isMovedFromInitialLocation = true;
 
-                    userProfileList.list.Add(thisUser);
-                }
-                else
-                {
-                    IList<LinkspotUser> list = new List<LinkspotUser>();
-                    list.Add(thisUser);
-                    UserProfileList profileList = new UserProfileList(thisUser.LatLngPositionX, thisUser.LatLngPositionY, list);
-                    userProfileListGroup.Add(profileList);
+                //    userProfileList.list.Add(thisUser);
+                //}
+                //else
+                //{
+                //    IList<LinkspotUser> list = new List<LinkspotUser>();
+                //    list.Add(thisUser);
+                //    UserProfileList profileList = new UserProfileList(thisUser.LatLngPositionX, thisUser.LatLngPositionY, list);
+                //    userProfileListGroup.Add(profileList);
                 }
             }
         }
@@ -153,27 +153,33 @@ namespace Algo
                 List<LinkspotUser> _previousLinkspotUsersList = new List<LinkspotUser>(_linkspotUsersList);
                 _previousLinkspotUsersList.Remove(linkspotUser);
 
+                IList<LinkspotUser> list = new List<LinkspotUser>();
+                UserProfileList profileList = new UserProfileList(0, 0, null);
+
                 foreach (LinkspotUser previousLinkspotUser in _previousLinkspotUsersList)
                 {
                     double distance = Math.Sqrt(Math.Pow((linkspotUser.LatLngPositionX - previousLinkspotUser.LatLngPositionX), 2) + Math.Pow((linkspotUser.LatLngPositionY - previousLinkspotUser.LatLngPositionY), 2));
                     float floatedDistance = Convert.ToSingle(distance);
 
-                    if (floatedDistance <= _defaultRadius * 2)
+                    //if (userProfileListGroup.Count() == 0)
+                    //{
+                    //    list.Add(previousLinkspotUser);
+                    //    UserProfileList userProfileList = new UserProfileList(previousLinkspotUser.LatLngPositionX, previousLinkspotUser.LatLngPositionY, list);
+                    //    userProfileListGroup.Add(userProfileList);
+                    //    continue;
+                    //}
+                    //else
+                    if (floatedDistance <= _defaultRadius * 4)
                     {
-                        if (userProfileListGroup.Count() == 0)
-                        {
-                            IList<LinkspotUser> list = new List<LinkspotUser>();
-                            list.Add(previousLinkspotUser);
-                            UserProfileList userProfileList = new UserProfileList(previousLinkspotUser.LatLngPositionX, previousLinkspotUser.LatLngPositionY, list);
-                            userProfileListGroup.Add(userProfileList);
-                            continue;
-                        }
-                        else
-                        {
-                            _calculateUserPositionInACircle(previousLinkspotUser);
-                        }
+                        _calculateUserPositionInACircle(previousLinkspotUser);
+                        list.Add(previousLinkspotUser);
+                        profileList.x = previousLinkspotUser.LatLngPositionX;
+                        profileList.y = previousLinkspotUser.LatLngPositionY;
+                        profileList.list = list;
+                        userProfileListGroup.Add(profileList);
                     }
                 }
+                continue;
             }
         }
 
@@ -181,7 +187,7 @@ namespace Algo
         {
             foreach (LinkspotUser linkspotUser in _linkspotUsersList)
             {
-                Thread.Sleep(400);
+                //Thread.Sleep(400);
 
                 PointF location = new PointF(linkspotUser.LatLngPositionX, linkspotUser.LatLngPositionY);
                 RectangleF rectangle = new RectangleF(location, _defaultSize);
