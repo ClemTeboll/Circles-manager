@@ -117,15 +117,37 @@ namespace Algo
         float degrees = 45;
         float defaultRadiusMultiplier = 3;
 
+        //private void _lastCollisionCheck(LinkspotUser thisUser)
+        //{
+        //    foreach (UserProfileList userProfileList in userProfileListGroup)
+        //    {
+        //        List<UserProfileList> _previousUserProfileGroup = new List<UserProfileList>(userProfileListGroup);
+        //        _previousUserProfileGroup.Remove(userProfileList);
+
+        //        foreach (UserProfileList newUserProfileList in _previousUserProfileGroup)
+        //        {
+        //            double newDistance = Math.Sqrt(Math.Pow((thisUser.LatLngPositionX - newUserProfileList.x), 2) + Math.Pow((thisUser.LatLngPositionY - newUserProfileList.y), 2));
+        //            float floatedNewDistance = Convert.ToSingle(newDistance);
+
+
+        //            if (floatedNewDistance <= _defaultRadius * 4)
+        //            {
+        //                thisUser.LatLngPositionX += 4;
+        //                thisUser.LatLngPositionY += 4;
+        //            }
+        //        }   
+        //    }
+        //}
+
         private void _calculateUserPositionInACircle(LinkspotUser thisUser)
         {
-            foreach (UserProfileList userProfileList in userProfileListGroup.ToList())
+            foreach (UserProfileList userProfileList in userProfileListGroup)
             {
                 double newDistance = Math.Sqrt(Math.Pow((thisUser.LatLngPositionX - userProfileList.x), 2) + Math.Pow((thisUser.LatLngPositionY - userProfileList.y), 2));
                 float floatedNewDistance = Convert.ToSingle(newDistance);
 
 
-                if (floatedNewDistance < _defaultRadius * 4)
+                if (floatedNewDistance <= _defaultRadius * 4)
                 {
                     float radian = Convert.ToSingle(degrees * Math.PI / 180);
                     float cosinusSinusMultiplier = userProfileList.list.Count();
@@ -133,18 +155,12 @@ namespace Algo
                     thisUser.LatLngPositionX = Convert.ToSingle(userProfileList.x + (_defaultRadius * defaultRadiusMultiplier) * Math.Cos(radian * (cosinusSinusMultiplier)));
                     thisUser.LatLngPositionY = Convert.ToSingle(userProfileList.y + (_defaultRadius * defaultRadiusMultiplier) * Math.Sin(radian * (cosinusSinusMultiplier)));
                     thisUser.isMovedFromInitialLocation = true;
-
-                //    userProfileList.list.Add(thisUser);
-                //}
-                //else
-                //{
-                //    IList<LinkspotUser> list = new List<LinkspotUser>();
-                //    list.Add(thisUser);
-                //    UserProfileList profileList = new UserProfileList(thisUser.LatLngPositionX, thisUser.LatLngPositionY, list);
-                //    userProfileListGroup.Add(profileList);
                 }
             }
+
+            //_lastCollisionCheck(thisUser);
         }
+
 
         private void _changeUsersPosition()
         {
@@ -161,15 +177,7 @@ namespace Algo
                     double distance = Math.Sqrt(Math.Pow((linkspotUser.LatLngPositionX - previousLinkspotUser.LatLngPositionX), 2) + Math.Pow((linkspotUser.LatLngPositionY - previousLinkspotUser.LatLngPositionY), 2));
                     float floatedDistance = Convert.ToSingle(distance);
 
-                    //if (userProfileListGroup.Count() == 0)
-                    //{
-                    //    list.Add(previousLinkspotUser);
-                    //    UserProfileList userProfileList = new UserProfileList(previousLinkspotUser.LatLngPositionX, previousLinkspotUser.LatLngPositionY, list);
-                    //    userProfileListGroup.Add(userProfileList);
-                    //    continue;
-                    //}
-                    //else
-                    if (floatedDistance <= _defaultRadius * 4)
+                    if (floatedDistance <= _defaultRadius * 2)
                     {
                         _calculateUserPositionInACircle(previousLinkspotUser);
                         list.Add(previousLinkspotUser);
