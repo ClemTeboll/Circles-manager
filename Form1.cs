@@ -61,9 +61,7 @@ namespace Algo
         public Form1()
         {
             InitializeComponent();
-            _redPen = new Pen(Color.Red);
             _greenPen = new Pen(Color.Green);
-            _brushForRedCircle = new SolidBrush(Color.Red);
             _brushForGreenCircle = new SolidBrush(Color.Green);
             _panel = DrawSpace.CreateGraphics();
             _defaultRadius = 5;
@@ -117,37 +115,15 @@ namespace Algo
         float degrees = 45;
         float defaultRadiusMultiplier = 3;
 
-        //private void _lastCollisionCheck(LinkspotUser thisUser)
-        //{
-        //    foreach (UserProfileList userProfileList in userProfileListGroup)
-        //    {
-        //        List<UserProfileList> _previousUserProfileGroup = new List<UserProfileList>(userProfileListGroup);
-        //        _previousUserProfileGroup.Remove(userProfileList);
-
-        //        foreach (UserProfileList newUserProfileList in _previousUserProfileGroup)
-        //        {
-        //            double newDistance = Math.Sqrt(Math.Pow((thisUser.LatLngPositionX - newUserProfileList.x), 2) + Math.Pow((thisUser.LatLngPositionY - newUserProfileList.y), 2));
-        //            float floatedNewDistance = Convert.ToSingle(newDistance);
-
-
-        //            if (floatedNewDistance <= _defaultRadius * 4)
-        //            {
-        //                thisUser.LatLngPositionX += 4;
-        //                thisUser.LatLngPositionY += 4;
-        //            }
-        //        }   
-        //    }
-        //}
-
         private void _calculateUserPositionInACircle(LinkspotUser thisUser)
         {
             foreach (UserProfileList userProfileList in userProfileListGroup)
             {
-                double newDistance = Math.Sqrt(Math.Pow((thisUser.LatLngPositionX - userProfileList.x), 2) + Math.Pow((thisUser.LatLngPositionY - userProfileList.y), 2));
-                float floatedNewDistance = Convert.ToSingle(newDistance);
+                double distanceToUserProfile = Math.Sqrt(Math.Pow((thisUser.LatLngPositionX - userProfileList.x), 2) + Math.Pow((thisUser.LatLngPositionY - userProfileList.y), 2));
+                float floatedDistanceToUserProfile = Convert.ToSingle(distanceToUserProfile);
 
 
-                if (floatedNewDistance <= _defaultRadius * 4)
+                if (floatedDistanceToUserProfile <= _defaultRadius * 4)
                 {
                     float radian = Convert.ToSingle(degrees * Math.PI / 180);
                     float cosinusSinusMultiplier = userProfileList.list.Count();
@@ -156,9 +132,7 @@ namespace Algo
                     thisUser.LatLngPositionY = Convert.ToSingle(userProfileList.y + (_defaultRadius * defaultRadiusMultiplier) * Math.Sin(radian * (cosinusSinusMultiplier)));
                     thisUser.isMovedFromInitialLocation = true;
                 }
-            }
-
-            //_lastCollisionCheck(thisUser);
+            }     
         }
 
 
@@ -174,10 +148,10 @@ namespace Algo
 
                 foreach (LinkspotUser previousLinkspotUser in _previousLinkspotUsersList)
                 {
-                    double distance = Math.Sqrt(Math.Pow((linkspotUser.LatLngPositionX - previousLinkspotUser.LatLngPositionX), 2) + Math.Pow((linkspotUser.LatLngPositionY - previousLinkspotUser.LatLngPositionY), 2));
-                    float floatedDistance = Convert.ToSingle(distance);
+                    double distanceToPreviousLinkspotUser = Math.Sqrt(Math.Pow((linkspotUser.LatLngPositionX - previousLinkspotUser.LatLngPositionX), 2) + Math.Pow((linkspotUser.LatLngPositionY - previousLinkspotUser.LatLngPositionY), 2));
+                    float floatedDistanceToPreviousLinkspotUser = Convert.ToSingle(distanceToPreviousLinkspotUser);
 
-                    if (floatedDistance <= _defaultRadius * 2)
+                    if (floatedDistanceToPreviousLinkspotUser <= _defaultRadius * 2)
                     {
                         _calculateUserPositionInACircle(previousLinkspotUser);
                         list.Add(previousLinkspotUser);
@@ -187,7 +161,6 @@ namespace Algo
                         userProfileListGroup.Add(profileList);
                     }
                 }
-                continue;
             }
         }
 
@@ -195,8 +168,6 @@ namespace Algo
         {
             foreach (LinkspotUser linkspotUser in _linkspotUsersList)
             {
-                //Thread.Sleep(400);
-
                 PointF location = new PointF(linkspotUser.LatLngPositionX, linkspotUser.LatLngPositionY);
                 RectangleF rectangle = new RectangleF(location, _defaultSize);
 
@@ -211,113 +182,113 @@ namespace Algo
             _drawUsers();
         }
 
-        public class Circle
-        {
-            public float x, y, width, height, initialXLocation, initalYLocation;
-            public bool isMovedFromInitialLocation;
+        //public class Circle
+        //{
+        //    public float x, y, width, height, initialXLocation, initalYLocation;
+        //    public bool isMovedFromInitialLocation;
 
-            public Circle(
-                float thisX,
-                float thisY,
-                float thisWidth,
-                float thisHeight,
-                bool ifIsMovedFromInitialLocation,
-                float thisInitialXLocation,
-                float thisInitalYLocation
-            )
-            {
-                x = thisX;
-                y = thisY;
-                width = thisWidth;
-                height = thisHeight;
-                isMovedFromInitialLocation = ifIsMovedFromInitialLocation;
-                initialXLocation = thisInitialXLocation;
-                initalYLocation = thisInitalYLocation;
-            }
-        }
+        //    public Circle(
+        //        float thisX,
+        //        float thisY,
+        //        float thisWidth,
+        //        float thisHeight,
+        //        bool ifIsMovedFromInitialLocation,
+        //        float thisInitialXLocation,
+        //        float thisInitalYLocation
+        //    )
+        //    {
+        //        x = thisX;
+        //        y = thisY;
+        //        width = thisWidth;
+        //        height = thisHeight;
+        //        isMovedFromInitialLocation = ifIsMovedFromInitialLocation;
+        //        initialXLocation = thisInitialXLocation;
+        //        initalYLocation = thisInitalYLocation;
+        //    }
+        //}
 
-        public class CircleList
-        {
-            public float x, y;
-            public IList<Circle> list;
+        //public class CircleList
+        //{
+        //    public float x, y;
+        //    public IList<Circle> list;
 
-            public CircleList(
-                float XInitialLocation,
-                float YInitialLocation,
-                IList<Circle> thisCircleList
-            )
-            {
-                x = XInitialLocation;
-                y = YInitialLocation;
-                list = thisCircleList;
-            }
+        //    public CircleList(
+        //        float XInitialLocation,
+        //        float YInitialLocation,
+        //        IList<Circle> thisCircleList
+        //    )
+        //    {
+        //        x = XInitialLocation;
+        //        y = YInitialLocation;
+        //        list = thisCircleList;
+        //    }
 
-        }
+        //}
 
-        IList<CircleList> circleListGroup = new List<CircleList>();
+        //IList<CircleList> circleListGroup = new List<CircleList>();
 
         private void BtnCreateCircle_Click(object sender, EventArgs e)
         {
-            float xInputBoxValue = float.Parse(XInputBox.Text);
-            float yInputBoxValue = float.Parse(YInputBox.Text);
+            //float xInputBoxValue = float.Parse(XInputBox.Text);
+            //float yInputBoxValue = float.Parse(YInputBox.Text);
 
-            if (circleListGroup.Count == 0)
-            {
-                Circle newCircle = new Circle(xInputBoxValue, yInputBoxValue, 10, 10, false, xInputBoxValue, yInputBoxValue);
-                IList<Circle> list = new List<Circle>();
-                list.Add(newCircle);
-                CircleList circleList = new CircleList(xInputBoxValue, yInputBoxValue, list);
-                circleListGroup.Add(circleList);
+            //if (circleListGroup.Count == 0)
+            //{
+            //    Circle newCircle = new Circle(xInputBoxValue, yInputBoxValue, 10, 10, false, xInputBoxValue, yInputBoxValue);
+            //    IList<Circle> list = new List<Circle>();
+            //    list.Add(newCircle);
+            //    CircleList circleList = new CircleList(xInputBoxValue, yInputBoxValue, list);
+            //    circleListGroup.Add(circleList);
 
-                _panel.DrawEllipse(_redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
-                _panel.FillEllipse(_brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
-            }
-            else
-            {
-                Circle newCircle = new Circle(xInputBoxValue, yInputBoxValue, 10, 10, false, xInputBoxValue, yInputBoxValue);
+            //    _panel.DrawEllipse(_redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
+            //    _panel.FillEllipse(_brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
+            //}
+            //else
+            //{
+            //    Circle newCircle = new Circle(xInputBoxValue, yInputBoxValue, 10, 10, false, xInputBoxValue, yInputBoxValue);
 
-                for (int i = 0; i < circleListGroup.Count(); i++)
-                {
-                    if (circleListGroup[i].x == newCircle.x && circleListGroup[i].y == newCircle.y)
-                    {
-                        foreach (Circle element in circleListGroup[i].list)
-                        {
-                            float circleListCount = circleListGroup[i].list.Count();
+            //    for (int i = 0; i < circleListGroup.Count(); i++)
+            //    {
+            //        if (circleListGroup[i].x == newCircle.x && circleListGroup[i].y == newCircle.y)
+            //        {
+            //            foreach (Circle element in circleListGroup[i].list)
+            //            {
+            //                float circleListCount = circleListGroup[i].list.Count();
 
-                            float degrees = 45;
-                            //float multiple = 8;
-                            float radius = 50 * ((circleListGroup[i].list.Count() - 1) / 8 + 1);
-                            //if (circleListCount - 1 % multiple == 0)
-                            //{
-                            //    radius = 50 * ((circleListCount - 1) / (degrees / multiple) + 1);
-                            //}
-                            float radian = Convert.ToSingle(degrees * Math.PI / 180);
-                            float multiplier = circleListCount;
+            //                float degrees = 45;
+            //                //float multiple = 8;
+            //                float radius = 50 * ((circleListGroup[i].list.Count() - 1) / 8 + 1);
+            //                //if (circleListCount - 1 % multiple == 0)
+            //                //{
+            //                //    radius = 50 * ((circleListCount - 1) / (degrees / multiple) + 1);
+            //                //}
+            //                float radian = Convert.ToSingle(degrees * Math.PI / 180);
+            //                float multiplier = circleListCount;
 
-                            if (element.x == newCircle.initialXLocation && element.y == newCircle.initalYLocation)
-                            {
-                                float newX = Convert.ToSingle(element.x + radius * Math.Cos(radian * (multiplier)));
-                                float newY = Convert.ToSingle(element.y + radius * Math.Sin(radian * (multiplier)));
+            //                if (element.x == newCircle.initialXLocation && element.y == newCircle.initalYLocation)
+            //                {
+            //                    float newX = Convert.ToSingle(element.x + radius * Math.Cos(radian * (multiplier)));
+            //                    float newY = Convert.ToSingle(element.y + radius * Math.Sin(radian * (multiplier)));
 
-                                newCircle.x = newX;
-                                newCircle.y = newY;
-                                newCircle.isMovedFromInitialLocation = true;
+            //                    newCircle.x = newX;
+            //                    newCircle.y = newY;
+            //                    newCircle.isMovedFromInitialLocation = true;
 
-                                circleListGroup[i].list.Add(newCircle);
-                                break;
-                            }
+            //                    circleListGroup[i].list.Add(newCircle);
+            //                    break;
+            //                }
 
-                        }
-                    }
-                }
-                IList<Circle> list = new List<Circle>();
-                list.Add(newCircle);
-                CircleList circleList = new CircleList(xInputBoxValue, yInputBoxValue, list);
-                circleListGroup.Add(circleList);
+            //            }
+            //        }
+            //    }
+            //    IList<Circle> list = new List<Circle>();
+            //    list.Add(newCircle);
+            //    CircleList circleList = new CircleList(xInputBoxValue, yInputBoxValue, list);
+            //    circleListGroup.Add(circleList);
 
-                _panel.DrawEllipse(_redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
-                _panel.FillEllipse(_brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
-            }
+            //    _panel.DrawEllipse(_redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
+            //    _panel.FillEllipse(_brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
+            //}
         }
 
         public void panel1_Paint(object sender, PaintEventArgs e)
