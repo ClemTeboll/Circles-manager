@@ -18,17 +18,17 @@ namespace Algo
             new LinkspotUser(320, 95, false, true, false, 297, 102),
             new LinkspotUser(320, 95, false, true, false, 315, 109),
             new LinkspotUser(320, 95, false, true, false, 290, 113),
-            new LinkspotUser(320, 95, false, true, false, 330, 120),
-            new LinkspotUser(320, 95, false, true, false, 308, 97),
-            new LinkspotUser(320, 95, false, true, false, 300, 100),
-            new LinkspotUser(320, 95, false, true, false, 310, 110),
-            new LinkspotUser(320, 95, false, true, false, 300, 104),
-            new LinkspotUser(320, 95, false, true, true, 320, 95)
+            new LinkspotUser(330, 120, false, true, false, 330, 120),
+            new LinkspotUser(308, 97, false, true, false, 308, 97),
+            new LinkspotUser(300, 100, false, true, false, 300, 100),
+            new LinkspotUser(310, 110, false, true, false, 310, 110),
+            new LinkspotUser(300, 104, false, true, false, 300, 104),
+            //new LinkspotUser(320, 96, false, true, false, 320, 96)
         };
 
-        LinkspotUser currentLinkspotUser = new LinkspotUser(320, 95, false, true, true, 305, 100);
-
-        List<LinkspotUser> _finalLinkspotUsersList = new List<LinkspotUser>();
+        LinkspotUser _currentLinkspotUser = new LinkspotUser(320, 95, false, true, true, 320, 95); // L'utilisateur principal, en train d'utiliser l'appli.
+        List<LinkspotUser> currentUserlist = new List<LinkspotUser>();
+        List<LinkspotUser> _finalLinkspotUsersList = new List<LinkspotUser>(); // Liste où seront copiés tous les profils et dont se servira la fonction _drawUsers
 
         Pen _redPen;
         Pen _greenPen;
@@ -53,12 +53,12 @@ namespace Algo
         public class LinkspotUser
         {
             public float LatLngPositionX, LatLngPositionY, initialLatLngPositionX, initialLatLngPositionY;
-            public bool isMovedFromInitialLocation, isVisible, isCurrentUser;
+            public bool isSimilarToCurrentUser, isVisible, isCurrentUser;
 
             public LinkspotUser(
                 float xPosition,
                 float yPosition,
-                bool ifIsMovedFromInitialLocation,
+                bool ifIsSimilarToCurrentUser,
                 bool visibility,
                 bool ifIsCurrentUser,
                 float thisInitialLatLngPositionX,
@@ -67,7 +67,7 @@ namespace Algo
             {
                 LatLngPositionX = xPosition;
                 LatLngPositionY = yPosition;
-                isMovedFromInitialLocation = ifIsMovedFromInitialLocation;
+                isSimilarToCurrentUser = ifIsSimilarToCurrentUser;
                 initialLatLngPositionX = thisInitialLatLngPositionX;
                 initialLatLngPositionY = thisInitialLatLngPositionY;
                 isVisible = visibility;
@@ -113,9 +113,8 @@ namespace Algo
 
         //            thisUser.LatLngPositionX = Convert.ToSingle(userProfileList.x + (_defaultRadius * defaultRadiusMultiplier) * Math.Cos(radian * (cosinusSinusMultiplier)));
         //            thisUser.LatLngPositionY = Convert.ToSingle(userProfileList.y + (_defaultRadius * defaultRadiusMultiplier) * Math.Sin(radian * (cosinusSinusMultiplier)));
-        //            thisUser.isMovedFromInitialLocation = true;
         //        }
-        //    }     
+        //    }
         //}
 
 
@@ -175,14 +174,116 @@ namespace Algo
         //    }
         //}
 
+
+
         private void _changeUsersPosition()
         {
+            currentUserlist.Add(_currentLinkspotUser);
 
+            foreach (LinkspotUser linkspotUser in _linkspotUsersList)
+            {
+                double distanceToCurrentLinkspotUser = Math.Sqrt(Math.Pow((_currentLinkspotUser.LatLngPositionX - linkspotUser.LatLngPositionX), 2) + Math.Pow((_currentLinkspotUser.LatLngPositionY - linkspotUser.LatLngPositionY), 2));
+                float floatedDistanceToCurrentLinkspotUser = Convert.ToSingle(distanceToCurrentLinkspotUser);
+
+                if (floatedDistanceToCurrentLinkspotUser <= _defaultRadius * 2)
+                {
+                    if (currentUserlist.Count() >= 1)
+                    {
+                        float radian = Convert.ToSingle(degrees * Math.PI / 180);
+                        float cosinusSinusMultiplier = currentUserlist.Count();
+
+                        linkspotUser.LatLngPositionX = Convert.ToSingle(linkspotUser.LatLngPositionX + (_defaultRadius * defaultRadiusMultiplier) * Math.Cos(radian * (cosinusSinusMultiplier + 1)));
+                        linkspotUser.LatLngPositionY = Convert.ToSingle(linkspotUser.LatLngPositionY + (_defaultRadius * defaultRadiusMultiplier) * Math.Sin(radian * (cosinusSinusMultiplier + 1)));
+                        linkspotUser.isSimilarToCurrentUser = true;
+                    }
+
+                    currentUserlist.Add(linkspotUser);
+                }
+
+                //List<LinkspotUser> _comparedLinkspotUsersList = new List<LinkspotUser>(_linkspotUsersList);
+                //_comparedLinkspotUsersList.Insert(0, _currentLinkspotUser);
+                //List<LinkspotUser> list = new List<LinkspotUser>();
+
+
+                //foreach (LinkspotUser _comparedLinkspotUser in _comparedLinkspotUsersList)
+                //{
+                //    if (_comparedLinkspotUser.isCurrentUser || _comparedLinkspotUser.isSimilarToCurrentUser)
+                //    {
+                //        continue;
+                //    }
+                //    else
+                //    {
+                //        double distanceToComparedLinkspotUser = Math.Sqrt(Math.Pow((linkspotUser.LatLngPositionX - _comparedLinkspotUser.LatLngPositionX), 2) + Math.Pow((linkspotUser.LatLngPositionY - _comparedLinkspotUser.LatLngPositionY), 2));
+                //        float floatedDistanceToComparedLinkspotUser = Convert.ToSingle(distanceToComparedLinkspotUser);
+
+                //        if (floatedDistanceToComparedLinkspotUser <= _defaultRadius * 2)
+                //        {
+                //            float radian = Convert.ToSingle(degrees * Math.PI / 180);
+                //            float cosinusSinusMultiplier = list.Count();
+
+                //            _comparedLinkspotUser.LatLngPositionX = Convert.ToSingle(linkspotUser.LatLngPositionX + (_defaultRadius * defaultRadiusMultiplier) * Math.Cos(radian * (cosinusSinusMultiplier)));
+                //            _comparedLinkspotUser.LatLngPositionY = Convert.ToSingle(linkspotUser.LatLngPositionY + (_defaultRadius * defaultRadiusMultiplier) * Math.Sin(radian * (cosinusSinusMultiplier)));
+                //        }
+                //    }
+                //}
+
+                
+            }
+
+            foreach (LinkspotUser similarLinkspotUser in currentUserlist)
+            {
+                _finalLinkspotUsersList.Add(similarLinkspotUser);
+                _linkspotUsersList.Remove(similarLinkspotUser);
+            }
+
+            foreach (LinkspotUser linkspotUser in _linkspotUsersList)
+            {
+                List<LinkspotUser> _comparedLinkspotUsersList = new List<LinkspotUser>(_finalLinkspotUsersList);
+
+
+                foreach (LinkspotUser _comparedLinkspotUser in _comparedLinkspotUsersList)
+                {
+                    double distanceToComparedLinkspotUser = Math.Sqrt(Math.Pow((_comparedLinkspotUser.LatLngPositionX - linkspotUser.LatLngPositionX), 2) + Math.Pow((_comparedLinkspotUser.LatLngPositionY - linkspotUser.LatLngPositionY), 2));
+                    float floatedDistanceToFinalLinkspotUser = Convert.ToSingle(distanceToComparedLinkspotUser);
+
+                    if (floatedDistanceToFinalLinkspotUser <= _defaultRadius * 4)
+                    {
+                        float radian = Convert.ToSingle(degrees * Math.PI / 180);
+                        linkspotUser.LatLngPositionX = Convert.ToSingle(linkspotUser.LatLngPositionX + (_defaultRadius * defaultRadiusMultiplier) * Math.Cos(radian * -1));
+                        linkspotUser.LatLngPositionY = Convert.ToSingle(linkspotUser.LatLngPositionY + (_defaultRadius * defaultRadiusMultiplier) * Math.Sin(radian * -1));
+                    }
+
+                }
+
+                Console.WriteLine(linkspotUser);
+                _finalLinkspotUsersList.Add(linkspotUser);
+
+            }
+
+            Console.WriteLine(_finalLinkspotUsersList);
         }
 
         private void _drawUsers()
         {
+            foreach (LinkspotUser linkspotUser in _finalLinkspotUsersList)
+            {
+                if (linkspotUser.isCurrentUser)
+                {
+                    PointF location = new PointF(linkspotUser.LatLngPositionX, linkspotUser.LatLngPositionY);
+                    RectangleF rectangle = new RectangleF(location, _defaultSize);
 
+                    _panel.DrawEllipse(_redPen, rectangle);
+                    _panel.FillEllipse(_brushForRedCircle, rectangle);
+                }
+                else
+                {
+                    PointF location = new PointF(linkspotUser.LatLngPositionX, linkspotUser.LatLngPositionY);
+                    RectangleF rectangle = new RectangleF(location, _defaultSize);
+
+                    _panel.DrawEllipse(_greenPen, rectangle);
+                    _panel.FillEllipse(_brushForGreenCircle, rectangle);
+                }
+            }
         }
 
 
@@ -192,119 +293,11 @@ namespace Algo
             _drawUsers();
         }
 
-        //public class Circle
-        //{
-        //    public float x, y, width, height, initialXLocation, initalYLocation;
-        //    public bool isMovedFromInitialLocation;
-
-        //    public Circle(
-        //        float thisX,
-        //        float thisY,
-        //        float thisWidth,
-        //        float thisHeight,
-        //        bool ifIsMovedFromInitialLocation,
-        //        float thisInitialXLocation,
-        //        float thisInitalYLocation
-        //    )
-        //    {
-        //        x = thisX;
-        //        y = thisY;
-        //        width = thisWidth;
-        //        height = thisHeight;
-        //        isMovedFromInitialLocation = ifIsMovedFromInitialLocation;
-        //        initialXLocation = thisInitialXLocation;
-        //        initalYLocation = thisInitalYLocation;
-        //    }
-        //}
-
-        //public class CircleList
-        //{
-        //    public float x, y;
-        //    public IList<Circle> list;
-
-        //    public CircleList(
-        //        float XInitialLocation,
-        //        float YInitialLocation,
-        //        IList<Circle> thisCircleList
-        //    )
-        //    {
-        //        x = XInitialLocation;
-        //        y = YInitialLocation;
-        //        list = thisCircleList;
-        //    }
-
-        //}
-
-        //IList<CircleList> circleListGroup = new List<CircleList>();
-
         private void BtnCreateCircle_Click(object sender, EventArgs e)
-        {
-            //float xInputBoxValue = float.Parse(XInputBox.Text);
-            //float yInputBoxValue = float.Parse(YInputBox.Text);
-
-            //if (circleListGroup.Count == 0)
-            //{
-            //    Circle newCircle = new Circle(xInputBoxValue, yInputBoxValue, 10, 10, false, xInputBoxValue, yInputBoxValue);
-            //    IList<Circle> list = new List<Circle>();
-            //    list.Add(newCircle);
-            //    CircleList circleList = new CircleList(xInputBoxValue, yInputBoxValue, list);
-            //    circleListGroup.Add(circleList);
-
-            //    _panel.DrawEllipse(_redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
-            //    _panel.FillEllipse(_brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
-            //}
-            //else
-            //{
-            //    Circle newCircle = new Circle(xInputBoxValue, yInputBoxValue, 10, 10, false, xInputBoxValue, yInputBoxValue);
-
-            //    for (int i = 0; i < circleListGroup.Count(); i++)
-            //    {
-            //        if (circleListGroup[i].x == newCircle.x && circleListGroup[i].y == newCircle.y)
-            //        {
-            //            foreach (Circle element in circleListGroup[i].list)
-            //            {
-            //                float circleListCount = circleListGroup[i].list.Count();
-
-            //                float degrees = 45;
-            //                //float multiple = 8;
-            //                float radius = 50 * ((circleListGroup[i].list.Count() - 1) / 8 + 1);
-            //                //if (circleListCount - 1 % multiple == 0)
-            //                //{
-            //                //    radius = 50 * ((circleListCount - 1) / (degrees / multiple) + 1);
-            //                //}
-            //                float radian = Convert.ToSingle(degrees * Math.PI / 180);
-            //                float multiplier = circleListCount;
-
-            //                if (element.x == newCircle.initialXLocation && element.y == newCircle.initalYLocation)
-            //                {
-            //                    float newX = Convert.ToSingle(element.x + radius * Math.Cos(radian * (multiplier)));
-            //                    float newY = Convert.ToSingle(element.y + radius * Math.Sin(radian * (multiplier)));
-
-            //                    newCircle.x = newX;
-            //                    newCircle.y = newY;
-            //                    newCircle.isMovedFromInitialLocation = true;
-
-            //                    circleListGroup[i].list.Add(newCircle);
-            //                    break;
-            //                }
-
-            //            }
-            //        }
-            //    }
-            //    IList<Circle> list = new List<Circle>();
-            //    list.Add(newCircle);
-            //    CircleList circleList = new CircleList(xInputBoxValue, yInputBoxValue, list);
-            //    circleListGroup.Add(circleList);
-
-            //    _panel.DrawEllipse(_redPen, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
-            //    _panel.FillEllipse(_brushForRedCircle, newCircle.x, newCircle.y, newCircle.width, newCircle.height);
-            //}
-        }
+        {}
 
         public void panel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
+        {}
     }
 }
 
