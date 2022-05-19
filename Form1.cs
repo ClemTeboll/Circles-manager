@@ -15,19 +15,19 @@ namespace Algo
     {
 
         List<LinkspotUser> _linkspotUsersList = new List<LinkspotUser> {
-            new LinkspotUser(320, 95, false, true, false, 320, 95),
-            new LinkspotUser(315, 69, false, true, false, 315, 69),
-            new LinkspotUser(326, 75, false, true, false, 326, 75),
-            new LinkspotUser(329, 110, false, true, false, 329, 110),
-            new LinkspotUser(318, 97, false, true, false, 318, 97),
-            new LinkspotUser(322, 110, false, true, false, 322, 110),
-            new LinkspotUser(328, 90, false, true, false, 328, 90),
-            new LinkspotUser(323, 104, false, true, false, 323, 104),
-            new LinkspotUser(320, 96, false, true, false, 320, 96)
+            new LinkspotUser(320, 95, false, true, false, 320, 95, false),
+            new LinkspotUser(320, 95, false, true, false, 315, 69, false),
+            new LinkspotUser(315, 100, false, true, false, 326, 75, false),
+            new LinkspotUser(320, 95, false, true, false, 329, 110, false),
+            new LinkspotUser(315, 100, false, true, false, 318, 97, false),
+            new LinkspotUser(331, 96, false, true, false, 322, 110, false),
+            new LinkspotUser(330, 94, false, true, false, 328, 90, false),
+            new LinkspotUser(331, 98, false, true, false, 323, 104, false),
+            new LinkspotUser(331, 50, false, true, false, 320, 96, false)
         };
 
-        LinkspotUser _currentLinkspotUser = new LinkspotUser(320, 95, false, true, true, 320, 95); // L'utilisateur principal, en train d'utiliser l'appli.
-        List<LinkspotUser> _finalLinkspotUsersList = new List<LinkspotUser>(); // Liste où seront copiés tous les profils et dont se servira la fonction _drawUsers
+        LinkspotUser _currentLinkspotUser = new LinkspotUser(320, 95, false, true, true, 320, 95, false);
+        List<LinkspotUser> _finalLinkspotUsersList = new List<LinkspotUser>();
 
         Pen _redPen;
         Pen _greenPen;
@@ -52,7 +52,7 @@ namespace Algo
         public class LinkspotUser
         {
             public float LatLngPositionX, LatLngPositionY, initialLatLngPositionX, initialLatLngPositionY;
-            public bool isSimilarToCurrentUser, isVisible, isCurrentUser;
+            public bool isSimilarToCurrentUser, isVisible, isCurrentUser, isMovedFromInitialLocation;
 
             public LinkspotUser(
                 float xPosition,
@@ -61,7 +61,8 @@ namespace Algo
                 bool visibility,
                 bool ifIsCurrentUser,
                 float thisInitialLatLngPositionX,
-                float thisInitialLatLngPositionY
+                float thisInitialLatLngPositionY,
+                bool thisIsMovedFromInitialLocation
             )
             {
                 LatLngPositionX = xPosition;
@@ -71,54 +72,31 @@ namespace Algo
                 initialLatLngPositionY = thisInitialLatLngPositionY;
                 isVisible = visibility;
                 isCurrentUser = ifIsCurrentUser;
+                isMovedFromInitialLocation = thisIsMovedFromInitialLocation;
             }
         }
         
         float degrees = 45;
         float defaultRadiusMultiplier = 3;
 
-
-        private void isCollidingWithFinalUsers(LinkspotUser user)
+        private void checkFinalLinkspotUserList(LinkspotUser linkspotUser)
         {
-            foreach (LinkspotUser finalLinkspotUser in _finalLinkspotUsersList)
+            foreach (LinkspotUser _finalLinkspotUser in _finalLinkspotUsersList)
             {
-                double distanceToFinalLinkspotUser = Math.Sqrt(Math.Pow((finalLinkspotUser.LatLngPositionX - user.LatLngPositionX), 2) + Math.Pow((finalLinkspotUser.LatLngPositionY - user.LatLngPositionY), 2));
-                float floatedDistanceToFinalLinkspotUser = Convert.ToSingle(distanceToFinalLinkspotUser);
+                double distanceToComparedLinkspotUser = Math.Sqrt(Math.Pow((_finalLinkspotUser.LatLngPositionX - linkspotUser.LatLngPositionX), 2) + Math.Pow((_finalLinkspotUser.LatLngPositionY - linkspotUser.LatLngPositionY), 2));
+                float floatedDistanceToFinalLinkspotUser = Convert.ToSingle(distanceToComparedLinkspotUser);
 
                 if (floatedDistanceToFinalLinkspotUser <= _defaultRadius * 2)
                 {
                     float radian = Convert.ToSingle(degrees * Math.PI / 180);
 
-                    user.LatLngPositionX = Convert.ToSingle(user.LatLngPositionX + (_defaultRadius * defaultRadiusMultiplier) * Math.Cos(radian * 1));
-                    user.LatLngPositionY = Convert.ToSingle(user.LatLngPositionY + (_defaultRadius * defaultRadiusMultiplier) * Math.Sin(radian * 1));
+                    linkspotUser.LatLngPositionX = Convert.ToSingle(linkspotUser.LatLngPositionX + (_defaultRadius * defaultRadiusMultiplier) * Math.Cos(radian * -1));
+                    linkspotUser.LatLngPositionY = Convert.ToSingle(linkspotUser.LatLngPositionY + (_defaultRadius * defaultRadiusMultiplier) * Math.Sin(radian * -1));
+                    linkspotUser.isMovedFromInitialLocation = true;
+
+                    checkFinalLinkspotUserList(linkspotUser);
                 }
             }
-        }
-
-        private void isCollidingWithUsers(LinkspotUser user)
-        {
-            foreach (LinkspotUser LastlinkspotUser in _linkspotUsersList)
-            {
-                double distanceToLastLinkspotUser = Math.Sqrt(Math.Pow((LastlinkspotUser.LatLngPositionX - user.LatLngPositionX), 2) + Math.Pow((LastlinkspotUser.LatLngPositionY - user.LatLngPositionY), 2));
-                float floatedDistanceToLastLinkspotUser = Convert.ToSingle(distanceToLastLinkspotUser);
-
-                if (floatedDistanceToLastLinkspotUser <= _defaultRadius * 2)
-                {
-                    float radian = Convert.ToSingle(degrees * Math.PI / 180);
-
-                    user.LatLngPositionX = Convert.ToSingle(user.LatLngPositionX + (_defaultRadius * defaultRadiusMultiplier) * Math.Cos(radian * 1));
-                    user.LatLngPositionY = Convert.ToSingle(user.LatLngPositionY + (_defaultRadius * defaultRadiusMultiplier) * Math.Sin(radian * 1));
-                    //lastComparison(user);
-                    isCollidingWithFinalUsers(user);
-                }
-            }
-        }
-
-        private void lastComparison(LinkspotUser linkspotUser)
-        {
-            isCollidingWithFinalUsers(linkspotUser);
-            isCollidingWithUsers(linkspotUser);
-            _finalLinkspotUsersList.Add(linkspotUser);
         }
 
         private void _changeUsersPosition()
@@ -130,14 +108,13 @@ namespace Algo
                 double distanceToCurrentLinkspotUser = Math.Sqrt(Math.Pow((_currentLinkspotUser.LatLngPositionX - linkspotUser.LatLngPositionX), 2) + Math.Pow((_currentLinkspotUser.LatLngPositionY - linkspotUser.LatLngPositionY), 2));
                 float floatedDistanceToCurrentLinkspotUser = Convert.ToSingle(distanceToCurrentLinkspotUser);
 
-                if (floatedDistanceToCurrentLinkspotUser <= _defaultRadius * 2 && _finalLinkspotUsersList.Count() >= 1)
+                if (floatedDistanceToCurrentLinkspotUser <= _defaultRadius * 2)
                 {
                     float radian = Convert.ToSingle(degrees * Math.PI / 180);
                     float cosinusSinusMultiplier = _finalLinkspotUsersList.Count();
 
-                    linkspotUser.LatLngPositionX = Convert.ToSingle(linkspotUser.LatLngPositionX + (_defaultRadius * defaultRadiusMultiplier) * Math.Cos(radian * (cosinusSinusMultiplier + 1)));
-                    linkspotUser.LatLngPositionY = Convert.ToSingle(linkspotUser.LatLngPositionY + (_defaultRadius * defaultRadiusMultiplier) * Math.Sin(radian * (cosinusSinusMultiplier + 1)));
-                    linkspotUser.isSimilarToCurrentUser = true;
+                    linkspotUser.LatLngPositionX = Convert.ToSingle(_currentLinkspotUser.LatLngPositionX + (_defaultRadius * defaultRadiusMultiplier) * Math.Cos(radian * (cosinusSinusMultiplier + 1)));
+                    linkspotUser.LatLngPositionY = Convert.ToSingle(_currentLinkspotUser.LatLngPositionY + (_defaultRadius * defaultRadiusMultiplier) * Math.Sin(radian * (cosinusSinusMultiplier + 1)));
 
                     _finalLinkspotUsersList.Add(linkspotUser);
                 }
@@ -150,27 +127,9 @@ namespace Algo
 
             foreach (LinkspotUser linkspotUser in _linkspotUsersList)
             {
-                lastComparison(linkspotUser);
+                checkFinalLinkspotUserList(linkspotUser);
+                _finalLinkspotUsersList.Add(linkspotUser);
             }
-
-            //foreach (LinkspotUser linkspotUser in _linkspotUsersList)
-            //{
-            //    foreach (LinkspotUser _finalLinkspotUser in _finalLinkspotUsersList)
-            //    {
-            //        double distanceToComparedLinkspotUser = Math.Sqrt(Math.Pow((_finalLinkspotUser.LatLngPositionX - linkspotUser.LatLngPositionX), 2) + Math.Pow((_finalLinkspotUser.LatLngPositionY - linkspotUser.LatLngPositionY), 2));
-            //        float floatedDistanceToFinalLinkspotUser = Convert.ToSingle(distanceToComparedLinkspotUser);
-
-            //        if (floatedDistanceToFinalLinkspotUser <= _defaultRadius * 4)
-            //        {
-            //            float radian = Convert.ToSingle(degrees * Math.PI / 180);
-            //            linkspotUser.LatLngPositionX = Convert.ToSingle(linkspotUser.LatLngPositionX + (_defaultRadius * defaultRadiusMultiplier) * Math.Cos(radian * -1));
-            //            linkspotUser.LatLngPositionY = Convert.ToSingle(linkspotUser.LatLngPositionY + (_defaultRadius * defaultRadiusMultiplier) * Math.Sin(radian * -1));
-            //        }
-            //    }
-
-            //    _finalLinkspotUsersList.Add(linkspotUser);
-            //    Console.WriteLine(_finalLinkspotUsersList);
-            //}
 
             Console.WriteLine(_finalLinkspotUsersList);
         }
